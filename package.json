@@ -1,0 +1,32 @@
+{
+  "name": "smartfarming",
+  "version": "1.0.0",
+  "description": "this is project",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --inspect index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.3",
+    "express-session": "^1.17.3",
+    "firebase": "^10.7.1",
+    "firebase-admin": "^12.0.0",
+    "http": "^0.0.1-security",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.0.3",
+    "morgan": "^1.10.0",
+    "mqtt": "^5.3.4",
+    "nodemon": "^3.0.2",
+    "path": "^0.12.7",
+    "qrcode": "^1.5.3",
+    "react-bootstrap": "^2.10.2",
+    "socket.io": "^4.7.4"
+  }
+}
