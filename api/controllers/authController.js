@@ -3,7 +3,7 @@ const { admin } = require("../connectFirebase/connect");
 const db = admin.firestore();
 const crypto = require("crypto");
 exports.register = async (req, res) => {
-  const { email, password, faceId, name, isAdmin } = req.body;
+  const { email, password, faceId, fistName,lastName, isAdmin,isRole } = req.body;
   try {
     const user = await admin.auth().createUser({
       email,
@@ -13,10 +13,12 @@ exports.register = async (req, res) => {
     await db.collection("users").doc(user.uid).set({
       email,
       faceId,
-      name,
+      fistName,
+      lastName,
+      isRole
     });
 
-    const claims = { name };
+    const claims = { lastName };
     if (isAdmin === 1) {
       claims.role = "admin";
     } else if (isAdmin === 0) {
@@ -27,7 +29,7 @@ exports.register = async (req, res) => {
 
     res.status(200).send(user);
   } catch (error) {
-    res.status(400).send(error);
+    console.log(error);
   }
 };
 exports.login = async (req, res) => {
@@ -37,7 +39,8 @@ exports.login = async (req, res) => {
     const uid = decodedToken.uid;
     const userDoc = await db.collection("users").doc(uid).get();
     const userData = userDoc.data();
-    const userName = userData.name;
+    const userName = userData.lastName;
+    console.log(userName);
     res.status(200).json({ name: userName });
   } catch (error) {
     console.log(error);

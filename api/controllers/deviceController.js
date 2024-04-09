@@ -13,7 +13,7 @@ exports.getDevices = async (req, res) => {
       ...doc.data(),
     });
   });
-
+  req.app.io.emit('devices', devices);
   res.status(200).json({
     devices,
   });
