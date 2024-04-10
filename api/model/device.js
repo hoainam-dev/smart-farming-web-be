@@ -18,7 +18,7 @@ const Device = {
 
 async function createDevice(data) {
   data.turn_on = admin.firestore.FieldValue.serverTimestamp();
-
+  
   const ref = await db.collection("devices").add(data);
 
   return ref;

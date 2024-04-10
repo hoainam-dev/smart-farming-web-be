@@ -15,10 +15,13 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.updateUserRole = async (req, res) => {
-  const { uid, role, name } = req.body;
+  const uid = req.params.id;
+  const { role, lastName, firstName } = req.body;
 
   try {
-    await admin.auth().setCustomUserClaims(uid, { role: role, name: name });
+    await admin.auth().setCustomUserClaims(uid, { role: role, lastName: lastName });
+    const userRef = admin.firestore().collection('users').doc(uid);
+    await userRef.update({ isRole: role, firstName: firstName, lastName: lastName});
     res
       .status(200)
       .json({ success: true, message: "User role updated successfully" });
@@ -54,6 +57,20 @@ exports.getUserDetails = async (req, res) => {
   res.status(200).json({
     user,
   });
+};
+exports.deleteUser = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const docRef = admin.firestore().collection("users").doc(id);
+    await docRef.delete();
+
+    await admin.auth().deleteUser(id);
+
+    res.status(200).json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Error deleting user", error });
+  }
 };
 exports.getUsers = async (req, res) => {
   const querySnapshot = await admin.firestore().collection("users").get();

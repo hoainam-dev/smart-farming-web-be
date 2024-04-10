@@ -13,9 +13,11 @@ exports.getDevices = async (req, res) => {
       ...doc.data(),
     });
   });
+  const deviceCount = devices.length;
   req.app.io.emit('devices', devices);
   res.status(200).json({
     devices,
+    deviceCount
   });
 };
 
@@ -107,10 +109,14 @@ exports.updateDeviceCollection = async (req, res) => {
 };
 exports.updateManuallyStatus = async (req, res) => {
   const id = req.params.id;
-  const { topic, status } = req.body;
+  const { topic, status} = req.body;
   const docRef = admin.firestore().collection("devices").doc(id);
+  const doc = await docRef.get();
+  const currentData = doc.data();
   await docRef.update({
     status: status,
+    turn_off: status === "OFF" ? admin.firestore.FieldValue.serverTimestamp(): currentData.turn_off,
+    turn_on: status === "ON" ? admin.firestore.FieldValue.serverTimestamp() :currentData.turn_on,
   });
   publishManuallyStatus(topic, id, status);
   res.status(200).send("Device status updated successfully!");

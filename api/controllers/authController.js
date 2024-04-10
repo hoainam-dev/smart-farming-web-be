@@ -3,7 +3,7 @@ const { admin } = require("../connectFirebase/connect");
 const db = admin.firestore();
 const crypto = require("crypto");
 exports.register = async (req, res) => {
-  const { email, password, faceId, fistName,lastName, isAdmin,isRole } = req.body;
+  const { email, password, faceId, firstName,lastName, isAdmin,isRole } = req.body;
   try {
     const user = await admin.auth().createUser({
       email,
@@ -13,7 +13,7 @@ exports.register = async (req, res) => {
     await db.collection("users").doc(user.uid).set({
       email,
       faceId,
-      fistName,
+      firstName,
       lastName,
       isRole
     });

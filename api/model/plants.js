@@ -26,10 +26,9 @@ async function createCollection(
     const newCollectionRef = parentDocumentRef.collection(newCollectionName);
     const data = {
       proposal: proposal,
-      dateChek:admin.firestore.FieldValue.serverTimestamp(),
-      Diagnostic:Diagnostic
+      dateChek: admin.firestore.FieldValue.serverTimestamp(),
+      Diagnostic: Diagnostic,
     };
-    // Thêm tài liệu mới vào collection
     const docRef = await newCollectionRef.add(data);
 
     console.log(`Document added with ID: ${docRef.id}`);
@@ -40,6 +39,10 @@ async function createCollection(
   }
 }
 async function updatePlants(id, data) {
-    return db.collection("plants").doc(id).update(data);
-  }
-module.exports = { devices, createPlant, createCollection,updatePlants };
+  data.plantingDate = admin.firestore.FieldValue.serverTimestamp();
+  return db.collection("plants").doc(id).update(data);
+}
+async function deletePlant(id) {
+  return db.collection("plants").doc(id).delete();
+}
+module.exports = { devices, createPlant, createCollection, updatePlants,deletePlant };

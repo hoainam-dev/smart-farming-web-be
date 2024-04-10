@@ -5,5 +5,6 @@ const temperatureHumidityController = require('../controllers/tempHumidityContro
 
 router.get('/', temperatureHumidityController.getLatestTemperatureHumidity);
 router.get('/temp', temperatureHumidityController.getTemperatureHumidity);
+router.get('/humidity', temperatureHumidityController.countHumidity);
 
 module.exports = router;
