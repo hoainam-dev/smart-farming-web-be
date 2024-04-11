@@ -3,21 +3,23 @@ const { admin } = require("../connectFirebase/connect");
 const db = admin.firestore();
 const crypto = require("crypto");
 exports.register = async (req, res) => {
-  const { email, password, faceId, firstName,lastName, isAdmin,isRole } = req.body;
+  const { email, password,  firstName,lastName, isAdmin,isRole } = req.body;
   try {
     const user = await admin.auth().createUser({
       email,
       password,
     });
-
-    await db.collection("users").doc(user.uid).set({
+    const firebase =  db.collection("users")
+    const userCount = await firebase.get();
+    const coutFaceId = userCount.size;
+    await firebase.doc(user.uid).set({
       email,
-      faceId,
+      faceId: coutFaceId,
       firstName,
       lastName,
       isRole
     });
-
+    
     const claims = { lastName };
     if (isAdmin === 1) {
       claims.role = "admin";

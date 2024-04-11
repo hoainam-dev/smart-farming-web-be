@@ -4,7 +4,7 @@ const { Humi, Temp } = require("./topic");
 
 // connect()
 const devicesRef = admin.firestore().collection("devices");
-const sersorRef = admin.firestore().collection("sensors");
+const sersorRef = admin.firestore().collection("sensors").doc("DBStaac6RvBSnDqzBTpl");
 async function subscriber() {
   const querySnapshot = await admin.firestore().collection("devices").get();
   let topics = [];
@@ -25,13 +25,38 @@ async function subscriber() {
     if (receivedTopic === Temp) {
       const messageString = message.toString();
       const data = parseTemperature(messageString);
-
+      
       if (data) {
         const { temperature } = data;
 
         try {
             await sersorRef
             .update({ temperature: temperature })
+            .then(() => {
+              console.log("Update success");
+            })
+            .catch((err) => {
+              console.error("Error updating", err);
+            });
+        } catch (error) {
+          console.error("Lỗi khi tìm kiếm phòng trong firebase:", error);
+        }
+      } else {
+        console.error("Dữ liệu không hợp lệ:", messageString);
+      }
+    }
+  });
+  client.on("message", async (receivedTopic, message) => {
+    if (receivedTopic === Humi) {
+      const messageString = message.toString();
+      const data = parseHumidity(messageString);
+      
+      if (data) {
+        const { humidity } = data;
+        
+        try {
+            await sersorRef
+            .update({ humidity: humidity })
             .then(() => {
               console.log("Update success");
             })
@@ -114,19 +139,27 @@ async function subscriber() {
 }
 
 function parseTemperature(messageString) {
-  const temperatureRegex = /Temperature: (\d+\.\d+)°C/i;
-  // const humidityRegex = /Humidity: (\d+)%/i;
+  const temperatureRegex = /(\d+\.\d+)/i;
 
   const temperatureMatch = messageString.match(temperatureRegex);
-  // const humidityMatch = messageString.match(humidityRegex);
 
   if (temperatureMatch) {
     const temperature = parseFloat(temperatureMatch[1]);
-    // const humidity = parseInt(humidityMatch[1]);
     return { temperature };
   }
 
   return null;
 }
+function parseHumidity(messageString) {
+  const humidityRegex = /(\d+)/i;
+    
+  const humidityMatch = messageString.match(humidityRegex);
 
+  if (humidityMatch) {
+    const humidity = parseInt(humidityMatch[1], 10);
+    return { humidity };
+  }
+
+  return null;
+}
 module.exports = { subscriber };

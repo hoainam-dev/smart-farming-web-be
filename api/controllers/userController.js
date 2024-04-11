@@ -63,9 +63,21 @@ exports.deleteUser = async (req, res) => {
 
   try {
     const docRef = admin.firestore().collection("users").doc(id);
+    const user = await docRef.get();
+    const deletedUserFaceId = user.data().faceId;
     await docRef.delete();
-
     await admin.auth().deleteUser(id);
+
+    const usersRef = admin.firestore().collection("users");
+
+    const snapshot = await usersRef.where('faceId', '>', deletedUserFaceId).get();
+    
+    const batch = admin.firestore().batch();
+    snapshot.docs.forEach((doc) => {
+      const user = doc.data();
+      batch.update(usersRef.doc(doc.id), { faceId: user.faceId - 1 });
+    });
+    await batch.commit();
 
     res.status(200).json({ success: true, message: "User deleted successfully" });
   } catch (error) {
