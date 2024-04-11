@@ -6,6 +6,7 @@ const Device = {
   name: String,
   status: String,
   topic: String,
+  control: String,
   turn_off: {
     type: Timestamp,
     default: null,

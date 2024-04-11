@@ -16,6 +16,7 @@ exports.checkRoleAdmin = async (req, res, next) => {
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
+    console.log("decodedToken.role " ,decodedToken.role );
     if (decodedToken.role !== "admin") {
       return res.status(403).json("Unauthorized");
     }

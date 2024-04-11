@@ -38,7 +38,7 @@ exports.updatePlants = async (req, res) => {
 exports.deletePlants = async (req, res) => {
   try {
     const id = req.params.id;
-    await plantsModel.deletePlant(id, data);
+    await plantsModel.deletePlant(id);
     res.status(201).json({ message: "Xóa thành công" });
   } catch (err) {
     console.log(err);
@@ -49,12 +49,12 @@ exports.getPlants = async (req, res) => {
   let plants = [];
   querySnapshot.forEach((doc) => {
     plants.push({
-        id: doc.id,
-        ...doc.data(),
+      id: doc.id,
+      ...doc.data(),
     });
   });
   res.status(200).json({
-    plants
+    plants,
   });
 };
 exports.getPlantDetails = async (req, res) => {
@@ -69,3 +69,44 @@ exports.getPlantDetails = async (req, res) => {
     plant,
   });
 };
+exports.getPlantByCollection = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const collectionName = req.query.collectionName;
+    const docRef = admin.firestore().collection("plants").doc(id);
+    const collection = docRef.collection(collectionName);
+
+    const querySnapshot = await collection.get();
+    let checkIllness = [];
+    querySnapshot.forEach((doc) => {
+      checkIllness.push({
+        id: doc.id,
+        ...doc.data(),
+      });
+    });
+
+    res.status(200).json({
+      checkIllness,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ err: err });
+  }
+};
+exports.getAllCollectionbyIdPlant = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const docRef = admin.firestore().collection("plants").doc(id);
+    const collections = await docRef.listCollections();
+    let allCollections = [];
+    for (const collection of collections) {
+      allCollections.push(collection.id);
+    }
+    res.status(200).json({
+      collections: allCollections,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ err: err });
+  }
+}
