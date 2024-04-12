@@ -3,21 +3,22 @@ const { admin } = require("../connectFirebase/connect");
 const db = admin.firestore();
 const crypto = require("crypto");
 exports.register = async (req, res) => {
-  const { email, password,  firstName,lastName, isAdmin,isRole } = req.body;
+  const { email, password,  firstName,lastName, isAdmin,isRole,faceId,isRecognition } = req.body;
   try {
     const user = await admin.auth().createUser({
       email,
       password,
     });
     const firebase =  db.collection("users")
-    const userCount = await firebase.get();
-    const coutFaceId = userCount.size;
+    // const userCount = await firebase.get();
+    // const coutFaceId = userCount.size;
     await firebase.doc(user.uid).set({
       email,
-      faceId: coutFaceId,
+      faceId,
       firstName,
       lastName,
-      isRole
+      isRole,
+      isRecognition
     });
     
     const claims = { lastName };
@@ -31,7 +32,7 @@ exports.register = async (req, res) => {
 
     res.status(200).send(user);
   } catch (error) {
-    console.log(error);
+    res.status(400).json(error);
   }
 };
 exports.login = async (req, res) => {
